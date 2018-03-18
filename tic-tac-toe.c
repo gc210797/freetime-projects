@@ -376,7 +376,7 @@ int main()
 		b[i] = NULL;
 
 	loc = -1;
-	turn = CIRCLE;
+	turn = CROSS;
 	filled = -1;
 	quit = 0;
 
@@ -387,7 +387,8 @@ int main()
 			else if(e.type == SDL_MOUSEBUTTONDOWN)
 				if(filled < 9 && turn == CROSS) {
 					loc = get_sign_loc(l);
-					filled++;
+					if(loc != -1 && b[loc] == NULL)
+						filled++;
 				}
 		}
 
@@ -406,7 +407,7 @@ int main()
 			}
 		}
 
-		if(loc != -1 && filled < 9) {
+		if(loc != -1 && filled < 9 && b[loc] == NULL) {
 			switch(turn) {
 			case CROSS:
 				place_signs(b, loc, CROSS, cross);
