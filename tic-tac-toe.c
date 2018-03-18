@@ -32,7 +32,7 @@ void system_init()
 		return;
 	}
 
-	win = SDL_CreateWindow("Tic Tac Toe", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
+	win = SDL_CreateWindow("Tic Tac Toe", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 			WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_SHOWN);
 	if(win == NULL) {
 		printf("Unable to create window: %s\n", SDL_GetError());
@@ -88,7 +88,7 @@ void display_box(struct line *l)
 
 void generate_shape(SDL_Texture **ob, enum shape T)
 {
-	*ob = SDL_CreateTexture(ren, SDL_GetWindowPixelFormat(win), 
+	*ob = SDL_CreateTexture(ren, SDL_GetWindowPixelFormat(win),
 			SDL_TEXTUREACCESS_TARGET, WIN_WIDTH / 6, WIN_HEIGHT / 6);
 
 	SDL_SetRenderTarget(ren, *ob);
@@ -159,7 +159,7 @@ void generate_shape(SDL_Texture **ob, enum shape T)
 
 	SDL_SetRenderTarget(ren, NULL);
 
-} 
+}
 
 int get_sign_loc(struct line *l)
 {
@@ -195,16 +195,16 @@ int get_sign_loc(struct line *l)
 
 void place_signs(struct boxes **b, int loc, enum shape sh, SDL_Texture *s)
 {
-	if(b[loc] != NULL)
+	if(loc == -1 && b[loc] != NULL)
 		return;
-	
+
 	SDL_Rect l;
 	l.w = WIN_WIDTH / 6;
 	l.h = WIN_HEIGHT / 6;
 	b[loc] = malloc(sizeof **b);
 	b[loc]->tex = s;
 	b[loc]->s = sh;
-	
+
 	switch(loc) {
 	case 0:
 		l.x = WIN_WIDTH / 12;
@@ -247,39 +247,122 @@ void place_signs(struct boxes **b, int loc, enum shape sh, SDL_Texture *s)
 	b[loc]->loc = l;
 }
 
-void check_winner(struct boxes **b)
+int check_winner(struct boxes **b)
 {
-	if(b[0] != NULL && b[4] != NULL && b[8] != NULL) {
-		if((b[0]->s == b[4]->s) && (b[4]->s == b[8]->s))
-			printf("%d is winner\n", b[0]->s);
+	if((b[0] != NULL && b[4] != NULL && b[8] != NULL) &&
+	((b[0]->s == b[4]->s) && (b[4]->s == b[8]->s))) {	
+		return b[0]->s;
 	}
-	else if(b[2] != NULL && b[4] != NULL && b[6] != NULL) {
-		if((b[2]->s == b[4]->s) && (b[4]->s == b[6]->s))
-			printf("%d is winner\n", b[2]->s);
+	else if((b[2] != NULL && b[4] != NULL && b[6] != NULL) && 
+	((b[2]->s == b[4]->s) && (b[4]->s == b[6]->s))) {
+		return b[2]->s;
 	}
-	else if(b[0] != NULL && b[1] != NULL && b[2] != NULL) {
-		if((b[0]->s == b[1]->s) && (b[1]->s == b[2]->s))
-			printf("%d is winner\n", b[0]->s);
+	else if((b[0] != NULL && b[1] != NULL && b[2] != NULL) &&
+	(b[0]->s == b[1]->s) && (b[1]->s == b[2]->s)) {
+		return b[0]->s;
 	}
-	else if(b[3] != NULL && b[4] != NULL && b[5] != NULL) {
-		if((b[3]->s == b[4]->s) && (b[4]->s == b[5]->s))
-			printf("%d is winner\n", b[3]->s);
+	else if((b[3] != NULL && b[4] != NULL && b[5] != NULL) &&
+	((b[3]->s == b[4]->s) && (b[4]->s == b[5]->s))) {
+		return b[3]->s;
 	}
-	else if(b[6] != NULL && b[7] != NULL && b[8] != NULL) {
-		if((b[6]->s == b[7]->s) && (b[7]->s == b[8]->s))
-			printf("%d is winner\n", b[6]->s);
+	else if((b[6] != NULL && b[7] != NULL && b[8] != NULL) &&
+	(b[6]->s == b[7]->s) && (b[7]->s == b[8]->s)) {
+		return b[6]->s;
 	}
-	else if(b[0] != NULL && b[3] != NULL && b[6] != NULL) {
-		if((b[0]->s == b[3]->s) && (b[3]->s == b[6]->s))
-			printf("%d is winner\n", b[0]->s);
+	else if((b[0] != NULL && b[3] != NULL && b[6] != NULL) &&
+	(b[0]->s == b[3]->s) && (b[3]->s == b[6]->s)) {
+		return b[0]->s;
 	}
-	else if(b[1] != NULL && b[4] != NULL && b[7] != NULL) {
-		if((b[1]->s == b[4]->s) && (b[4]->s == b[7]->s))
-			printf("%d is winner\n", b[1]->s);
+	else if((b[1] != NULL && b[4] != NULL && b[7] != NULL) &&
+	(b[1]->s == b[4]->s) && (b[4]->s == b[7]->s)) {
+		return b[1]->s;
 	}
-	else if(b[2] != NULL && b[5] != NULL && b[8] != NULL) {
-		if((b[2]->s == b[5]->s) && (b[5]->s == b[8]->s))
-			printf("%d is winner\n", b[2]->s);
+	else if((b[2] != NULL && b[5] != NULL && b[8] != NULL) && 
+	(b[2]->s == b[5]->s) && (b[5]->s == b[8]->s)) {
+		return b[2]->s;
+	}
+
+	return -1;
+}
+
+int place_move(struct boxes **b)
+{
+	int i;
+	int j;
+	int k;
+	int empty;
+	int filled[9];
+
+	for(i = 0, empty = 1; i < 9; i++) {
+		if(b[i] != NULL) {
+			empty = 0;
+			break;
+		}
+	}
+
+	if(empty) {
+		return 4;
+	}
+	else {
+		for(i = 0, j = 0; i < 9; i++) {
+			if(b[i] != NULL) {
+				if(b[i]->s == CROSS)
+					filled[i] = 1;
+				else
+					filled[i] = 2;
+			}
+			else {
+				filled[i] = 0;
+			}
+		}
+
+		/*for(i = 1; i < 9; i++) {
+			if(filled[i] == 0) {
+				if(i == 1 || i == 5 || i == 7) {
+					if(filled[(i - 1) % 9] == 1 && filled[(i + 1) % 9] == 1)
+						return i;
+				}
+				else if(filled[(i + 6) % 9] == 1 && filled[(i + 3) % 9] == 1)
+					return i;
+				else if(filled[(i + 4) % 9] == 1 && filled[(i + 8) % 9] == 1)
+					return i;
+				else if(filled[(i + 2) % 9] == 1 && filled[(i + 5) % 9] == 1)
+					return i;
+			}
+		}*/
+
+		for(i = 0; i < 9; i++) {
+			if(filled[i] == 0) {
+				b[i] = malloc(sizeof **b);
+				b[i]->s = CROSS;
+				//b[i]->loc = i;
+				//b[i]->tex = NULL;
+
+				if(check_winner(b) != -1) {
+					free(b[i]);
+					b[i] = NULL;
+					return i;
+				}
+
+				free(b[i]);
+				b[i] = NULL;
+			}
+		}
+
+		if(b[4] == NULL)
+			return 4;
+		else if(b[0] == NULL)
+			return 0;
+		else if(b[2] == NULL)
+			return 2;
+		else if(b[6] == NULL)
+			return 6;
+		else if(b[8] == NULL)
+			return 8;
+		for(i = 0; i < 9; i++) {
+			if(filled[i] == 0)
+				return i;
+		}
 	}
 }
 
@@ -291,8 +374,10 @@ int main()
 	SDL_Texture *circle;
 	SDL_Texture *cross;
 	enum shape turn;
+	enum shape winner;
 	int loc;
 	int i;
+	int filled;
 	int quit;
 
 	system_init();
@@ -307,6 +392,7 @@ int main()
 
 	loc = -1;
 	turn = CIRCLE;
+	filled = -1;
 	quit = 0;
 
 	while(!quit) {
@@ -314,7 +400,10 @@ int main()
 			if(e.type == SDL_QUIT)
 				quit = 1;
 			else if(e.type == SDL_MOUSEBUTTONDOWN)
-				loc = get_sign_loc(l);
+				if(filled < 9 && turn == CROSS) {
+					loc = get_sign_loc(l);
+					filled++;
+				}
 		}
 
 		SDL_SetRenderDrawColor(ren, 0xff, 0xff, 0xff, 0xff);
@@ -322,7 +411,17 @@ int main()
 
 		display_box(l);
 
-		if(loc != -1) {
+		if((winner = check_winner(b)) != -1) {
+			printf("%d is winner\n", winner);
+		}
+		else {
+			if(filled < 9 && turn == CIRCLE) {
+				loc = place_move(b);
+				filled++;
+			}
+		}
+
+		if(loc != -1 && filled < 9) {
 			switch(turn) {
 			case CROSS:
 				place_signs(b, loc, CROSS, cross);
@@ -336,8 +435,6 @@ int main()
 		}
 
 		loc = -1;
-		
-		check_winner(b);
 
 		for(i = 0; i < 9; i++) {
 			if(b[i] != NULL)
