@@ -250,10 +250,10 @@ void place_signs(struct boxes **b, int loc, enum shape sh, SDL_Texture *s)
 int check_winner(struct boxes **b)
 {
 	if((b[0] != NULL && b[4] != NULL && b[8] != NULL) &&
-	((b[0]->s == b[4]->s) && (b[4]->s == b[8]->s))) {	
+	((b[0]->s == b[4]->s) && (b[4]->s == b[8]->s))) {
 		return b[0]->s;
 	}
-	else if((b[2] != NULL && b[4] != NULL && b[6] != NULL) && 
+	else if((b[2] != NULL && b[4] != NULL && b[6] != NULL) &&
 	((b[2]->s == b[4]->s) && (b[4]->s == b[6]->s))) {
 		return b[2]->s;
 	}
@@ -277,7 +277,7 @@ int check_winner(struct boxes **b)
 	(b[1]->s == b[4]->s) && (b[4]->s == b[7]->s)) {
 		return b[1]->s;
 	}
-	else if((b[2] != NULL && b[5] != NULL && b[8] != NULL) && 
+	else if((b[2] != NULL && b[5] != NULL && b[8] != NULL) &&
 	(b[2]->s == b[5]->s) && (b[5]->s == b[8]->s)) {
 		return b[2]->s;
 	}
@@ -315,21 +315,6 @@ int place_move(struct boxes **b)
 				filled[i] = 0;
 			}
 		}
-
-		/*for(i = 1; i < 9; i++) {
-			if(filled[i] == 0) {
-				if(i == 1 || i == 5 || i == 7) {
-					if(filled[(i - 1) % 9] == 1 && filled[(i + 1) % 9] == 1)
-						return i;
-				}
-				else if(filled[(i + 6) % 9] == 1 && filled[(i + 3) % 9] == 1)
-					return i;
-				else if(filled[(i + 4) % 9] == 1 && filled[(i + 8) % 9] == 1)
-					return i;
-				else if(filled[(i + 2) % 9] == 1 && filled[(i + 5) % 9] == 1)
-					return i;
-			}
-		}*/
 
 		for(i = 0; i < 9; i++) {
 			if(filled[i] == 0) {
