@@ -380,7 +380,10 @@ int place_move(struct boxes **b)
 			}
 		}
 
-		return 4;
+		if(filled[4] == 0)
+			return 4;
+		else if(filled[0] == 0)
+			return 0;
 	}
 }
 
