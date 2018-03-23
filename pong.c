@@ -128,7 +128,7 @@ void bot_mv(void *d)
 	p->vely = 4;
 	d_y = ((data->p1->r.y - data->ball_loc->y) * (data->p1->r.y - data->ball_loc->y));
 
-	if(*data->ball_velx > 0 && data->ball_loc->x >= 640 / 8) {
+	if(*data->ball_velx > 0 && data->ball_loc->x >=  640 / 2 + 640 / 40) {
 		if(p->r.y - data->ball_loc->y < 0)
 			p->r.y += p->vely;
 		else
