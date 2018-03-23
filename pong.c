@@ -128,8 +128,8 @@ void bot_mv(void *d)
 	p->vely = 4;
 	d_y = ((data->p1->r.y - data->ball_loc->y) * (data->p1->r.y - data->ball_loc->y));
 
-	if(*data->ball_velx > 0 && data->ball_loc->x >=  640 / 2 + 640 / 40) {
-		if(p->r.y - data->ball_loc->y < 0)
+	if(*data->ball_velx > 0 && p->r.y + p->r.h != data->ball_loc->y && data->ball_loc->x >=  640 / 2) {
+		if(p->r.y < data->ball_loc->y)
 			p->r.y += p->vely;
 		else
 			p->r.y += -p->vely;
@@ -220,8 +220,6 @@ int main()
 		}
 
 		p1->move(p1);
-		if(beg)
-			p2->move(&bt);
 
 		if(!beg) {
 			ball_loc.x = p1->r.x + p1->r.w;
@@ -242,6 +240,9 @@ int main()
 			if(ball_loc.x >= 640 || ball_loc.x <= 0)
 				ball_velx = -ball_velx;
 		}
+
+		if(beg)
+			p2->move(&bt);
 
 		SDL_SetRenderDrawColor(ren, 0x00, 0x00, 0x00, 0xff);
 		SDL_RenderClear(ren);
