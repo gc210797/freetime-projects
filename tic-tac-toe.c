@@ -334,20 +334,53 @@ int place_move(struct boxes **b)
 			}
 		}
 
-		if(b[4] == NULL)
-			return 4;
-		else if(b[0] == NULL)
-			return 0;
-		else if(b[2] == NULL)
-			return 2;
-		else if(b[6] == NULL)
-			return 6;
-		else if(b[8] == NULL)
-			return 8;
 		for(i = 0; i < 9; i++) {
-			if(filled[i] == 0)
-				return i;
+			if(filled[i] == 0) {
+				b[i] = malloc(sizeof **b);
+				b[i]->s = CIRCLE;
+
+				if(check_winner(b) != -1) {
+					free(b[i]);
+					b[i] = NULL;
+					return i;
+				}
+
+				free(b[i]);
+				b[i] = NULL;
+			}
 		}
+
+		for(i = 0; i < 9; i++) {
+			int j;
+			if(filled[i] == 0) {
+				b[i] = malloc(sizeof **b);
+				b[i]->s = CIRCLE;
+
+				for(j = 0; j < 9; j++) {
+					if(filled[j] == 0) {
+						b[j] = malloc(sizeof **b);
+						b[j]->s = CIRCLE;
+
+						if(check_winner(b) != -1) {
+							free(b[j]);
+							b[j] = NULL;
+							free(b[i]);
+							b[i] = NULL;
+
+							return i;
+						}
+
+						free(b[j]);
+						b[j] = NULL;
+					}
+				}
+
+				free(b[i]);
+				b[i] = NULL;
+			}
+		}
+
+		return 4;
 	}
 }
 
