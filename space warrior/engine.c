@@ -101,9 +101,9 @@ int player_get_health(void *ref)
 	return ((struct player *)ref)->health;
 }
 
-int player_dec_health(void *ref)
+int player_dec_health(void *ref, void *obj)
 {
-	return --((struct player *)ref)->health;
+	return ((struct player *)ref)->health -= ((struct player *)obj)->health;
 }
 
 void player_set_tex(void *ref, const char *t_path)
