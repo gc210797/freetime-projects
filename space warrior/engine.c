@@ -1,7 +1,11 @@
+/*
+ * TODO: REMOVE void * arg taking
+ */
+
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "engine.h"
+#include <SDL2/SDL_ttf.h>
 
 #define ERROR_LOG(...) fprintf(stderr, __VA_ARGS__)
 
@@ -13,6 +17,13 @@ typedef enum {
 struct player {
 	int health;
 	SDL_Rect pos;
+	SDL_Texture *tex;
+};
+
+struct text {
+	SDL_Rect pos;
+	TTF_Font *f;
+	SDL_Color c;
 	SDL_Texture *tex;
 };
 
@@ -47,6 +58,11 @@ int engine_init(const char *win_title, int win_w, int win_h)
 			ERROR_LOG("Unable to init SDL IMAGE: %s\n", IMG_GetError());
 			status = false;
 		}
+
+		if(TTF_Init() == -1) {
+			ERROR_LOG("Unable to init SDL TTF: %s\n", TTF_GetError());
+			status = false;
+		}
 	}
 
 	return status;
@@ -57,6 +73,7 @@ void engine_quit()
 	SDL_DestroyRenderer(ren);
 	SDL_DestroyWindow(win);
 	IMG_Quit();
+	TTF_Quit();
 	SDL_Quit();
 }
 
@@ -83,6 +100,103 @@ static SDL_Texture *image_load(const char *path, SDL_Rect *s)
 	}
 
 	return ret;
+}
+
+struct text *text_new(const char *str, int x, int y, int w, int h,
+		Uint8 r, Uint8 g, Uint8 b, const char *font, int size)
+{
+	struct text *ret;
+
+	ret = malloc(sizeof *ret);
+	ret->f = TTF_OpenFont(font, size);
+	if(ret->f == NULL) {
+		ERROR_LOG("Unable to load font: %s\n", TTF_GetError());
+		free(ret);
+		ret = NULL;
+	}
+	else {
+		SDL_Surface *s;
+
+		ret->c.r = r;
+		ret->c.g = g;
+		ret->c.b = b;
+		ret->c.a = 0xff;
+
+		ret->pos.x = x;
+		ret->pos.y = y;
+		ret->pos.w = w;
+		ret->pos.h = h;
+
+		s = TTF_RenderText_Solid(ret->f, str, ret->c);
+		if(s == NULL) {
+			ERROR_LOG("Unable to create text surface: %s\n", TTF_GetError());
+			free(ret);
+			ret = NULL;
+		}
+		else {
+			ret->tex = SDL_CreateTextureFromSurface(ren, s);
+			if(ret->tex == NULL) {
+				ERROR_LOG("Unable to create texture: %s\n", SDL_GetError());
+				free(ret);
+				ret = NULL;
+			}
+
+			SDL_FreeSurface(s);
+		}
+	}
+
+	return ret;
+}
+
+bool text_mod_str(struct text *t, const char *str)
+{
+	SDL_Surface *s;
+	bool ret;
+
+	s = TTF_RenderText_Solid(t->f, str, t->c);
+	ret = true;
+	if(s == NULL) {
+		ERROR_LOG("Unable to create surface: %s\n", TTF_GetError());
+		ret = false;
+	}
+	else {
+		SDL_DestroyTexture(t->tex);
+		t->tex = NULL;
+
+		t->tex = SDL_CreateTextureFromSurface(ren, s);
+		if(t->tex == NULL) {
+			ERROR_LOG("Unable to create texture: %s\n", SDL_GetError());
+			ret = false;
+		}
+
+		SDL_FreeSurface(s);
+	}
+
+	return ret;
+}
+
+void text_mod_pos(struct text *t, int x, int y, int w, int h)
+{
+	SDL_Rect pos;
+
+	pos.x = x;
+	pos.y = y;
+	pos.w = w;
+	pos.h = h;
+
+	t->pos = pos;
+}
+
+void text_render(struct text *t)
+{
+	SDL_RenderCopy(ren, t->tex, NULL, &t->pos);
+}
+
+void text_rm(struct text *t)
+{
+	SDL_DestroyTexture(t->tex);
+	TTF_CloseFont(t->f);
+	free(t);
 }
 
 void *player_new(int health, const char *t_path)
